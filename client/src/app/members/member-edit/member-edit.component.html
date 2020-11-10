@@ -4,6 +4,9 @@
       <div class="col-sm-4">
           <h1>Your Profile</h1>
       </div>
+
+
+      
      
      
 <div class="row" *ngIf="member">
@@ -44,6 +47,8 @@
         <div class="col-8">
            <tabset class="member-tabset">
                <tab heading ="About {{member.knowAs}}">
+
+                
                 <form #editForm="ngForm" id="editForm" (ngSubmit)="updateMember()">
                     <h4>Description</h4>
                     <textarea class="form-control" [(ngModel)]="member.introduction"name="introduction" rows="6"></textarea>
@@ -57,11 +62,11 @@
                          <input  [(ngModel)]="member.city"  type="text" name="city"class="form-control mx-2">
                          <label for="country">Country:</label>
                          <input  [(ngModel)]="member.country"  type="text" name="country"class="form-control mx-2">
-                     </div>
-                   </form>
-                   
-
+                     </div>                  
+                    </form>
+                
                </tab>
+               
                 <tab heading ="Edit Photos">
                    <p>Photo edit will be here.</p> 
                    </tab>                 
