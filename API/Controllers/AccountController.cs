@@ -49,7 +49,7 @@ namespace API.Controllers
             {
                 Username = user.Username,
                 Token = this.tokenService.CreateToken(user),
-                PhotoUtl= user.Photos.FirstOrDefault(x=> x.IsMain)?.Url
+                PhotoUrl= user.Photos.FirstOrDefault(x=> x.IsMain)?.Url
 
             };
         }
@@ -78,7 +78,8 @@ namespace API.Controllers
             return new UserDto
             {
                 Username = user.Username,
-                Token = this.tokenService.CreateToken(user)
+                Token = this.tokenService.CreateToken(user),
+                PhotoUrl = user.Photos.FirstOrDefault(x => x.IsMain)?.Url
 
             };
         }
