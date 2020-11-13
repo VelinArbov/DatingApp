@@ -33,21 +33,17 @@ namespace API.Controllers
 
         [HttpGet]
       
-        public async Task<ActionResult<IEnumerable<MemberDto>>> GetUsers()
+        public async Task<ActionResult<IEnumerable<MemberDto>>> GetUsers([FromQuery]UserParams userParams)
         {
-            var users = await this.userRepository.GetMembersAsync();
+            var users = await this.userRepository.GetMembersAsync(userParams);
+
+
+            Response.AddPaginationHeader(users.CurrentPage,users.PageSize,users.TotalCount,users.TotalPages);
 
             return Ok(users);
         }
 
-        /// api/users/id
-        // [HttpGet("{id}")]
    
-        // public async Task<ActionResult<AppUser>> GetUserById(int id)
-        // {
-        //     return await this.userRepository.GetUserByIdAsync(id);
-        // }
-
 
          [HttpGet("{username}",Name = "GetUser")]
    
