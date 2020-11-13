@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using API.Interfaces;
+using AutoMapper;
 
 namespace API.Controllers
 {
@@ -15,43 +16,48 @@ namespace API.Controllers
     {
         private readonly DataContext context;
         private readonly ITokenService tokenService;
+        private readonly IMapper mapper;
 
-        public AccountController(DataContext context, ITokenService tokenService)
+        public AccountController(DataContext context, ITokenService tokenService, IMapper mapper)
         {
             this.tokenService = tokenService;
+            this.mapper = mapper;
             this.context = context;
         }
 
         [HttpPost("register")]
         public async Task<ActionResult<UserDto>> Register(RegisterDto registerDto)
         {
+            
             if (await UserExist(registerDto.Username))
             {
                 return BadRequest("Username is taken");
             }
+            var user = this.mapper.Map<AppUser>(registerDto);
             using var hmac = new HMACSHA512();
 
 
 
-            var user = new AppUser
-            {
+           
 
-                Username = registerDto.Username,
-                PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(registerDto.Password)),
-                PasswordSalt = hmac.Key,
+                user.Username = registerDto.Username.ToLower();
+                user.PasswordHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(registerDto.Password));
+                user.PasswordSalt = hmac.Key;
 
-            };
+           
 
             await this.context.Users.AddAsync(user);
             await this.context.SaveChangesAsync();
 
-            return new UserDto
-            {
-                Username = user.Username,
-                Token = this.tokenService.CreateToken(user),
-                PhotoUrl= user.Photos.FirstOrDefault(x=> x.IsMain)?.Url
+            var userDto = new UserDto ();
+        
+               userDto.Username = user.Username;
+               userDto.Token = this.tokenService.CreateToken(user);
+               userDto.KnowAs = user.KnowAs;
+            
 
-            };
+            return userDto;
+            
         }
 
 
@@ -79,7 +85,8 @@ namespace API.Controllers
             {
                 Username = user.Username,
                 Token = this.tokenService.CreateToken(user),
-                PhotoUrl = user.Photos.FirstOrDefault(x => x.IsMain)?.Url
+                PhotoUrl = user.Photos.FirstOrDefault(x => x.IsMain)?.Url,
+                KnowAs= user.KnowAs
 
             };
         }
