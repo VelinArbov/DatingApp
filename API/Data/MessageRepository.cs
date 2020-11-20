@@ -38,10 +38,10 @@ namespace API.Data
            var messages = await this.context.Messages
            .Include(u => u.Sender).ThenInclude(p => p.Photos)
            .Include(u => u.Recipient).ThenInclude(p => p.Photos)
-           .Where(x=> x.Recipient.Username == currentUsername
+           .Where(x=> x.Recipient.Username == currentUsername && x.RecipientDeleted == false
                     && x.Sender.Username == recipientUsername
                     || x.Recipient.Username == recipientUsername
-                    && x.Sender.Username == currentUsername
+                    && x.Sender.Username == currentUsername && x.SenderDeleted == false
             )
             .OrderBy(m => m.MessageSent)
             .ToListAsync();
@@ -66,7 +66,10 @@ namespace API.Data
 
         public async Task<Message> GetMessage(int id)
         {
-            return await this.context.Messages.FindAsync(id);
+            return await this.context.Messages
+            .Include(u => u.Sender)
+            .Include(u => u.Recipient)
+            .SingleOrDefaultAsync(x=> x.Id == id);
         }
 
         public async Task<PageList<MessageDto>> GetMessagesForUser(MessageParams messageParams)
@@ -77,9 +80,12 @@ namespace API.Data
 
             query = messageParams.Container switch
             {
-                "Inbox" => query.Where(u => u.Recipient.Username == messageParams.Username),
-                "Outbox" => query.Where(u => u.Sender.Username == messageParams.Username),
-                _ => query.Where(u => u.Recipient.Username == messageParams.Username && u.DateRead == null)
+                "Inbox" => query.Where(u => u.Recipient.Username == messageParams.Username 
+                && u.RecipientDeleted == false),
+                "Outbox" => query.Where(u => u.Sender.Username == messageParams.Username 
+                && u.SenderDeleted == false),
+                _ => query.Where(u => u.Recipient.Username == messageParams.Username && u.RecipientDeleted == false
+                && u.DateRead == null)
 
 
             };
