@@ -101,5 +101,29 @@ namespace API.Data
         {
             return await this.context.SaveChangesAsync() > 0;
         }
+
+        public void AddGroup(Group group)
+        {
+            this.context.Groups.Add(group);
+        }
+
+        public void RemoveConnection(Connection connection)
+        {
+
+          this.context.Connections.Remove(connection);
+
+        }
+
+        public async Task<Connection> GetConnection(string connectionId)
+        {
+            return await this.context.Connections.FindAsync(connectionId);
+        }
+
+        public async Task<Group> GetMessageGroup(string groupName)
+        {
+            return await this.context.Groups
+            .Include(x=> x.Connections)
+            .FirstOrDefaultAsync(x=> x.Name == groupName);
+        }
     }
 }
