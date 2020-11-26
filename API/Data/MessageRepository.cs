@@ -54,7 +54,7 @@ namespace API.Data
             {
                 foreach (var message in messages)
                 {
-                    message.DateRead = DateTime.Now;
+                    message.DateRead = DateTime.UtcNow;
                 }
 
                 await this.context.SaveChangesAsync();
@@ -124,6 +124,14 @@ namespace API.Data
             return await this.context.Groups
             .Include(x=> x.Connections)
             .FirstOrDefaultAsync(x=> x.Name == groupName);
+        }
+
+        public async Task<Group> GetGroupForConnection(string connectionId)
+        {
+            return await this.context.Groups
+            .Include(c => c.Connections)
+            .Where(c => c.Connections.Any(x=> x.ConnectionId == connectionId))
+            .FirstOrDefaultAsync();
         }
     }
 }
