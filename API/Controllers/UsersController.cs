@@ -58,7 +58,9 @@ namespace API.Controllers
 
         public async Task<ActionResult<MemberDto>> GetUserByUsername(string username)
         {
-            return await this.unitOfWork.userRepository.GetMemberAsync(username);
+            var currentUsername = User.GetUsername();
+            return await this.unitOfWork.userRepository.GetMemberAsync(username,
+             isCurrentUser: currentUsername == username);
 
 
 

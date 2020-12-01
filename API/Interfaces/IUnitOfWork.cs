@@ -11,6 +11,9 @@ namespace API.Interfaces
 
          IMessageRepository messageRepository { get;}
 
+         IPhotoRepository photoRepository { get;}
+
+
          Task<bool> Complete();
 
          bool HasChanges();
