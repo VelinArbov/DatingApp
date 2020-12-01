@@ -45,7 +45,10 @@ namespace API
             services.AddControllers();
             services.AddCors();
             services.AddIdentityServices(_config);
-            services.AddSignalR();
+            services.AddSignalR(e => {
+                e.MaximumReceiveMessageSize = 102400000;
+                e.EnableDetailedErrors = true;}
+                );
         
 
         }

@@ -17,7 +17,7 @@ namespace API.DTOs
 
         public int RecipientId { get; set; }
         public string RecipientUsername { get; set; }
-        public string  RecipientPhotUrl { get; set; }
+        public string  RecipientPhotoUrl { get; set; }
 
         [JsonIgnore]
         public bool RecipientDeleted { get; set; }
@@ -26,7 +26,7 @@ namespace API.DTOs
 
         public string Content { get; set; }
 
-        public DateTime? DateRead { get; set; }
+        public DateTimeOffset? DateRead { get; set; }
 
         public DateTime MessageSent {get;set;} = DateTime.Now;
 

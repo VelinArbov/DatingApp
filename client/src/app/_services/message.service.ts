@@ -23,28 +23,39 @@ export class MessageService {
 
   createHubConnection(user: User, otherUsername: string){
     this.hubConnection = new HubConnectionBuilder()
-    .withUrl(this.hubUrl + 'message?user=' + otherUsername, {
+    
+    .withUrl(this.hubUrl + 'message?user=' + otherUsername,  {
       accessTokenFactory: () => user.token
     })
     .withAutomaticReconnect()
     .build();
 
+  
+
     this.hubConnection.start().catch(e => console.log(e));
+
+
+
 
     this.hubConnection.on('ReceiveMessageThread', messages => {
       this.messageThreadSource.next(messages);
     })
+
+
 
     this.hubConnection.on('NewMessage', message => {
       this.messageThread$.pipe(take(1)).subscribe(messages => {
         this.messageThreadSource.next([...messages, message])
       })
     })
+  
+
 
 
     this.hubConnection.on('UpdatedGroup', (group: Group)=> {
       if(group.connections.some(x=> x.username === otherUsername))
       {
+        console.log(this.hubConnection.state);
         this.messageThread$.pipe(take(1)).subscribe(messages => {
           messages.forEach(message => {
             if(!message.dateRead){
@@ -56,12 +67,15 @@ export class MessageService {
       }
 
     })
+  
+
 
   }
 
 
   stopHubConnection(){
     if(this.hubConnection){
+      this.messageThreadSource.next([]);
       this.hubConnection.stop();
     }
    } 
@@ -81,6 +95,7 @@ export class MessageService {
 
 
   async sendMessage(username: string, content : string){
+    
     return this.hubConnection.invoke('SendMessage',{recipientUsername: username, content})
     .catch(error => console.log(error));
   }

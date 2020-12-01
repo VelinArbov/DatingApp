@@ -24,6 +24,7 @@ namespace API.Helpers
            user.LastActive = DateTime.UtcNow;
 
            await repo.Complete();
-        }
+        
     }
+  }
 }
