@@ -41,15 +41,12 @@ namespace API
 
 
 
-            services.AddAplicationServices(_config);
+        services.AddAplicationServices(_config);
             services.AddControllers();
             services.AddCors();
             services.AddIdentityServices(_config);
-            services.AddSignalR(e => {
-                e.MaximumReceiveMessageSize = 102400000;
-                e.EnableDetailedErrors = true;}
-                );
-        
+            services.AddSignalR();
+
 
         }
 
@@ -67,6 +64,14 @@ namespace API
             .AllowCredentials()
             .WithOrigins("https://localhost:4200"));
 
+
+             app.UseCors(x => x.AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials()
+            .WithOrigins("https://testdatingapp2.herokuapp.com"));
+
+
+         
             app.UseAuthentication();
             app.UseAuthorization();
 
@@ -78,7 +83,7 @@ namespace API
                 endpoints.MapControllers();
                 endpoints.MapHub<PresenceHub>("hubs/presence");
                 endpoints.MapHub<MessageHub>("hubs/message");
-                endpoints.MapFallbackToController("Index","Fallback");
+                endpoints.MapFallbackToController("Index", "Fallback");
             });
         }
     }

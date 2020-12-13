@@ -1,18 +1,15 @@
 <div class="card">
-    <div class="card-body">
+    <div class="card-body" #scrollMe style="overflow: scroll; height: 300px;" [scrollTop]="scrollMe.scrolHeight">
         <div *ngIf="(messageService.messageThread$ | async)?.length === 0">
-            No messages yet... say hi by  using the message box below
+            No messages yet... say hi by using the message box below
         </div>
 
-        <ul #scrollMe
-            style="overflow: scroll; height: 300px;"
-            [scrollTop]="scrollMe.scrolHeight"
-        *ngIf="(messageService.messageThread$ | async)?.length > 0" class="chat">
+        <ul *ngIf="(messageService.messageThread$ | async)?.length > 0" class="chat">
             <li *ngFor="let message of (messageService.messageThread$ | async)">
                 <div>
-                <span class="chat-img float-right">
-                    <img class="rounded-cirlce" src="{{message.senderPhotoUrl || './assets/user.png'}}" 
-                    alt="{{message.senderUsername}}">
+                    <span class="chat-img float-right">
+                        <img class="rounded-cirlce" src="{{message.senderPhotoUrl || './assets/user.png'}}"
+                            alt="{{message.senderUsername}}">
                     </span>
                     <div class="chat-body">
                         <div class="header">
@@ -20,36 +17,33 @@
                                 <span class="fa fa-clock-o">{{message.messageSent | timeago}}</span>
                                 <span class="text-danger" *ngIf="!message.dateRead 
                                 && message.senderUsername !== username">
-                                    (unread)    
+                                    (unread)
                                 </span>
                                 <span class="text-success" *ngIf="message.dateRead 
                                 && message.senderUsername !== username">
-                                    (read {{message.dateRead | timeago}})     
+                                    (read {{message.dateRead | timeago}})
                                 </span>
                             </small>
                         </div>
                         <p>{{message.content}}</p>
                     </div>
-            </div>
+                </div>
             </li>
         </ul>
     </div>
 
-<div class="card-footer">
-    <form #messageForm ='ngForm' (ngSubmit)='sendMessage()' autocomplite=off>
-        <div class="input-group">
-            <input 
-            name="messageContent"
-            required
-            [(ngModel)]="messageContent"
-            type="text" 
-            class="form-control input-sm"
-             placeholder="Send a private message">
-            <div class="input-group-append">
-                <button [disabled]='!messageForm.valid' class="btn btn-primary" type="submit">Send</button>
+    <div class="card-footer">
+        <form #messageForm='ngForm' (ngSubmit)='sendMessage()' autocomplite=off>
+            <div class="input-group">
+                <input name="messageContent" required [(ngModel)]="messageContent" type="text"
+                    class="form-control input-sm" placeholder="Send a private message">
+                <div class="input-group-append">
+                    <button [disabled]='!messageForm.valid || loading' class="btn btn-primary" type="submit">Send
+                        <i *ngIf="loading" class="fa fa-spinner fa-spin"></i>
+                    </button>
+                </div>
             </div>
-        </div>
-    </form>
-</div>
+        </form>
+    </div>
 
 </div>

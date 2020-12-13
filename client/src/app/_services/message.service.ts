@@ -7,6 +7,7 @@ import { environment } from 'src/environments/environment';
 import { Group } from '../_modules/group';
 import { Message } from '../_modules/message';
 import { User } from '../_modules/user';
+import { BusyService } from './busy.service';
 import { getPaginatedResult, getPaginationHeaders } from './paginationHelper';
 
 @Injectable({
@@ -19,9 +20,10 @@ export class MessageService {
   private messageThreadSource = new BehaviorSubject<Message[]>([]);
   messageThread$ = this.messageThreadSource.asObservable();
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private busyService: BusyService) { }
 
   createHubConnection(user: User, otherUsername: string){
+    this.busyService.busy();
     this.hubConnection = new HubConnectionBuilder()
     
     .withUrl(this.hubUrl + 'message?user=' + otherUsername,  {
@@ -32,12 +34,15 @@ export class MessageService {
 
   
 
-    this.hubConnection.start().catch(e => console.log(e));
+    this.hubConnection.start()
+    .catch(e => console.log(e))
+    .finally(()=> this.busyService.idle());
 
 
 
 
     this.hubConnection.on('ReceiveMessageThread', messages => {
+      this.messageThreadSource.next([]);
       this.messageThreadSource.next(messages);
     })
 
@@ -48,6 +53,10 @@ export class MessageService {
         this.messageThreadSource.next([...messages, message])
       })
     })
+
+
+    
+  
   
 
 
@@ -92,7 +101,6 @@ export class MessageService {
   getMessageThread(username: string){
     return this.http.get<Message[]>(this.baseUrl + 'messages/thread/' + username);
   }
-
 
   async sendMessage(username: string, content : string){
     
