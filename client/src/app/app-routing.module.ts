@@ -17,19 +17,24 @@ import { MemberDetailedResolver } from './_resolvers/member-detailed.resolver';
 
 
 const routes: Routes = [
-  {path:'',component:HomeComponent},
-  {path:'members',component: MemberListComponent},
-  {path:'members/:username',component: MemberDetailComponent,resolve: {member: MemberDetailedResolver}},
-  {path:'member/edit',component: MemberEditComponent, canDeactivate:[PreventUnsavedChangesGuard]},
-  {path:'lists',component: ListsComponent,canActivate: [AuthGuard]},
-  {path:'messages',component: MessagesComponent,canActivate: [AuthGuard]},
-  {path:'admin',component: AdminPanelComponent,canActivate: [AdminGuard]},
-  
-  {path:'errors',component: TestErrorsComponent},
-  {path:'not-found', component: NotFoundComponent},
-  {path:'server-error', component: ServerErrorComponent},
-  {path:'**',component: HomeComponent,pathMatch:'full'},
- 
+  {path: '', component: HomeComponent},
+  {
+    path: '',
+    runGuardsAndResolvers: 'always',
+    canActivate: [AuthGuard],
+    children: [
+      {path: 'members', component: MemberListComponent},
+      {path: 'members/:username', component: MemberDetailComponent, resolve: {member: MemberDetailedResolver}},
+      {path: 'member/edit', component: MemberEditComponent, canDeactivate: [PreventUnsavedChangesGuard]},
+      {path: 'lists', component: ListsComponent},
+      {path: 'messages', component: MessagesComponent},
+      {path: 'admin', component: AdminPanelComponent, canActivate: [AdminGuard]},
+    ]
+  },
+  {path: 'errors', component: TestErrorsComponent},
+  {path: 'not-found', component: NotFoundComponent},
+  {path: 'server-error', component: ServerErrorComponent},
+  {path: '**', component: NotFoundComponent, pathMatch: 'full'},
 ];
 
 @NgModule({
